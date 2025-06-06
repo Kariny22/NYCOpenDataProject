@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search Incidents</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="chart.html">Charts</a></li>
+      <li><a href="search.html">Search</a></li>
+      
+    </ul>
+  </nav>
+  <h2>Find a Shooting Incident</h2>
+  <input type="text" id="searchInput" placeholder="Enter borough name..." />
+  <div id="results"></div>
+
+  <script>
+    let incidents = [];
+    async function loadData() {
+      const res = await fetch('https://data.cityofnewyork.us/resource/833y-fsy8.json');
+      incidents = await res.json();
+    }
+    function render(results) {
+      const container = document.getElementById('results');
+      container.innerHTML = '';
+      results.slice(0, 20).forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <h3>Borough: ${item.boro || 'Unknown'}</h3>
+          <p><strong>Date:</strong> ${item.occur_date || 'N/A'}</p>
+          <p><strong>Location:</strong> ${item.loc_of_occur_desc || 'N/A'}</p>
+          <p><strong>Perpetrator Sex:</strong> ${item.perp_sex || 'Unknown'}</p>
+        `;
+        container.appendChild(card);
+      });
+    }
+    document.getElementById('searchInput').addEventListener('input', e => {
+      const term = e.target.value.toLowerCase();
+      const filtered = incidents.filter(r => (r.boro || '').toLowerCase().includes(term));
+      render(filtered);
+    });
+    loadData();
+  </script>
+</body>
+</html>

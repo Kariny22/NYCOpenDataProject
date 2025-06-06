@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shooting Charts</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <nav>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="chart.html">Charts</a></li>
+      <li><a href="search.html">Search</a></li>
+    </ul>
+  </nav>
+  <h2>Shooting Incidents by Borough</h2>
+  <canvas id="boroughChart" width="400" height="200"></canvas>
+
+  <script>
+    async function drawChart() {
+      const res = await fetch('https://data.cityofnewyork.us/resource/833y-fsy8.json');
+      const data = await res.json();
+      const counts = {};
+      data.forEach(item => {
+        const b = item.boro || 'Unknown';
+        counts[b] = (counts[b] || 0) + 1;
+      });
+      const labels = Object.keys(counts);
+      const values = Object.values(counts);
+      new Chart(
+        document.getElementById('boroughChart'),
+        {
+          type: 'bar',
+          data: { labels, datasets: [{ label: '# of Shooting Incidents', data: values }] },
+          options: { responsive: true }
+        }
+      );
+    }
+    drawChart();
+  </script>
+</body>
+</html>
